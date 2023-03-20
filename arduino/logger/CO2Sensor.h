@@ -28,13 +28,14 @@
 class CO2Sensor : public Sensor {
   private:
     uint8_t _n;
-    SCD30 *_airSensor;
+    SCD30 _airSensor;
 
   public:
     CO2Sensor (uint8_t n, SCD30 *airSensor);
     void read ();
 
   private:
+    void begin();
     void select();
 };
 
@@ -44,8 +45,10 @@ class CO2Sensor : public Sensor {
  * 
  */
 CO2Sensor::CO2Sensor(uint8_t n, SCD30 *airSensor) {
-  _airSensor = airSensor;
+  //_airSensor = airSensor;
   _n = n;
+
+  begin();
 }
 
 /**
@@ -55,7 +58,7 @@ void CO2Sensor::read() {
   // select the CO2 sensor
   select();
 
-  double value = _airSensor->getCO2();
+  double value = _airSensor.getTemperature();
 
   Serial.print("CO2 ");
   Serial.print(_n);
@@ -73,5 +76,22 @@ void CO2Sensor::select() {
 
   Wire.beginTransmission(TCAADDR);
   Wire.write(1 << _n);
-  int r = Wire.endTransmission();
+  bool r = Wire.endTransmission();
+  Serial.print("select ");
+  Serial.print(_n);
+  Serial.print(" ");
+  Serial.println(r);
+}
+
+void CO2Sensor::begin() {
+  int n = 0;
+  select();
+  _airSensor.begin(Wire);
+  while (_airSensor.begin(Wire) == 0 && n++ < 5) {
+    Serial.print("BEGIN ");
+    Serial.println(_airSensor.isConnected());
+
+    delay(500);
+    select();
+  }
 }
