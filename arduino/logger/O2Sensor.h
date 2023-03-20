@@ -2,19 +2,17 @@
 #define __O2_SENSOR_H
 #include <Arduino.h>
 
-class O2Sensor {
+#include "Constants.h"
+#include "Sensor.h"
+
+class O2Sensor : public Sensor {
   private:
     int _pin;
-    Accumulator _accumulator;
 
   public:
     O2Sensor (int pin);
     void read ();
     double average ();
-    void clear();
-    
- private:
-   void initialize ();
 };
 
 #endif
@@ -24,10 +22,9 @@ class O2Sensor {
  */
 O2Sensor::O2Sensor(int pin)
 {
-  _accumulator = Accumulator();
   _pin = pin;
 
-  pinMode(_pin, OUTPUT);
+  pinMode(_pin, INPUT);
 }
 
 /**
@@ -51,12 +48,12 @@ double O2Sensor::average() {
   double rawAverage = _accumulator.average();
   double value =  map(rawAverage, ONE_VOLT, 1024, 0, MAX_OXYGEN);
 
-  return value < 0 ? 0 : value;
-}
+  Serial.print("O2 Average ");
+  Serial.print(_pin);
+  Serial.print(" rawAverage: ");
+  Serial.print(rawAverage);
+  Serial.print(" value: ");
+  Serial.println(value);
 
-/**
- * 
- */
-void O2Sensor::clear() {
-  _accumulator.clear();
+  return value < 0 ? 0 : value / 100.0;
 }

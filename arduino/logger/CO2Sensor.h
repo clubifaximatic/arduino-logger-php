@@ -5,8 +5,8 @@
 #include <SparkFun_SCD30_Arduino_Library.h>
 #include <Wire.h>
 
-#include "Accumulator.h"
-#include "constants.h"
+#include "Constants.h"
+#include "Sensor.h"
 
 /**
  * pins CO2
@@ -25,17 +25,14 @@
  * 8 SDA
  * 9 SLC
  */
-class CO2Sensor {
+class CO2Sensor : public Sensor {
   private:
     uint8_t _n;
     SCD30 *_airSensor;
-    Accumulator _accumulator;
 
   public:
     CO2Sensor (uint8_t n, SCD30 *airSensor);
     void read ();
-    double average ();
-    void clear();
 
   private:
     void select();
@@ -47,7 +44,6 @@ class CO2Sensor {
  * 
  */
 CO2Sensor::CO2Sensor(uint8_t n, SCD30 *airSensor) {
-  _accumulator = Accumulator();
   _airSensor = airSensor;
   _n = n;
 }
@@ -72,18 +68,6 @@ void CO2Sensor::read() {
 /**
  * 
  */
-double CO2Sensor::average() {
-  return _accumulator.average();
-}
-
-/**
- * 
- */
-void CO2Sensor::clear() {
-  _accumulator.clear();
-}
-
-
 void CO2Sensor::select() {
   if (_n > 7) return;
 
