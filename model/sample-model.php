@@ -4,7 +4,7 @@ class SampleModel extends Database
 {
     public function list($limit)
     {
-        return $this->select("SELECT * FROM samples ORDER BY created_at ASC LIMIT ?", ["i", $limit]);
+        return $this->select("SELECT * FROM samples ORDER BY created_at DESC LIMIT ?", ["i", $limit]);
     }
 
     public function get($since, $until)
@@ -14,6 +14,7 @@ class SampleModel extends Database
     
     public function set($data)
     {
-        return $this->insert("INSERT INTO samples (data) VALUES (?)", ["s", $data]);
+        $timestamp = date('Y-m-d H:i:s');
+        return $this->insert("INSERT INTO samples (created_at, data) VALUES (?,?)", ["ss", $timestamp, $data]);
     }
 }

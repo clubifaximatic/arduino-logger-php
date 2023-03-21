@@ -120,7 +120,7 @@ void CO2Sensor::begin() {
   select();
   _airSensor.begin(Wire);
   while (_airSensor.begin(Wire) == 0 && n++ < 5) {
-    Serial.print("BEGIN ");
+    Serial.print("BEGIN CO2 sensor ");
     Serial.println(_airSensor.isConnected());
 
     delay(500);
