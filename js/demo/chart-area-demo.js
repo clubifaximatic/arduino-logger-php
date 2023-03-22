@@ -2,6 +2,83 @@
 Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 Chart.defaults.global.defaultFontColor = '#858796';
 
+const options = {
+  maintainAspectRatio: true,
+  elements: {
+    point:{
+        radius: 0
+    }
+  },
+  layout: {
+    padding: {
+      left: 5,
+      right: 5,
+      top: 5,
+      bottom: 5
+    }
+  },
+  scales: {
+    x: {
+      type: 'time',
+      time: {
+          displayFormats: {
+              quarter: 'MMM YYYY'
+          }
+      }
+    },
+    xAxes: [{
+      time: {
+        unit: 'time'
+      },
+      gridLines: {
+        display: true,
+        drawBorder: false
+      },
+      ticks: {
+        maxTicksLimit: 10
+      }
+    }],
+    yAxes: [{
+      ticks: {
+        maxTicksLimit: 20,
+        padding: 1,
+        // Include a dollar sign in the ticks
+        // callback: function(value, index, values) {
+        //   return '$' + number_format(value);
+        // }
+      },
+      gridLines: {
+        color: "rgb(234, 236, 244)",
+        zeroLineColor: "rgb(234, 236, 244)",
+        drawBorder: false,
+        borderDash: [2],
+        zeroLineBorderDash: [2]
+      }
+    }],  
+  },
+  tooltips: {
+    backgroundColor: "rgb(255,255,255)",
+    bodyFontColor: "#858796",
+    titleMarginBottom: 10,
+    titleFontColor: '#6e707e',
+    titleFontSize: 14,
+    borderColor: '#dddfeb',
+    borderWidth: 1,
+    xPadding: 15,
+    yPadding: 15,
+    displayColors: true,
+    intersect: false,
+    mode: 'index',
+    caretPadding: 10,
+    // callbacks: {
+    //   label: function(tooltipItem, chart) {
+    //     var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+    //     return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+    //   }
+    // }
+  }  
+}
+
 // function number_format(number, decimals, dec_point, thousands_sep) {
 //   // *     example: number_format(1234.56, 2, ',', ' ');
 //   // *     return: '1 234,56'
@@ -27,219 +104,147 @@ Chart.defaults.global.defaultFontColor = '#858796';
 //   return s.join(dec);
 // }
 
-d3.csv('https://bideko.elllimoner.com/index.php/sample/fetch?since=2023-03-21 06:40')
-  .then(makeChart);
+function allZeros(array) {
+  return array.every(item => item === 0 || item === "0.00");
+}
 
-function makeChart(samples) {
-  var ctxCO2 = document.getElementById("chartCO2");
-  var ctxO2 = document.getElementById("chartO2");
+function createDataset(label, color, data) {
+  if (allZeros(data)) {
+    return false;
+  }
 
-  const colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796' ]
-  const theLabels = samples.map(function(d) {return d.timestamp});
+  if (label == "O2_4") {
+    label = "RH_2";
+  } else if (label == "O2_3") {
+    label = "TMP_2";
+  } else if (label == "O2_2") {
+    label = "RH_1";
+  } else if (label == "O2_1") {
+    label = "TMP_1";
+  }
+  
+  return {
+    label: label,
+    tension: 0.4,
+    fill: false,
+    borderColor: color,
+    data: data
+  };
+}
 
-  const co2_1 = samples.map(function(d) {return d.CO2_1});
-  const co2_2 = samples.map(function(d) {return d.CO2_2});
-  const co2_3 = samples.map(function(d) {return Number(d.CO2_3)});
-  const co2_4 = samples.map(function(d) {return d.CO2_4});
-  const co2_5 = samples.map(function(d) {return d.CO2_5});
-  const co2_6 = samples.map(function(d) {return d.CO2_6});
+var co2Chart;
+var o2Chart;
 
-  var chart = new Chart(ctxCO2, {
+/**
+ * 
+ */
+function ceateChart(elementName) {
+  var element = document.getElementById(elementName);
+  return new Chart(element, {
     type: 'line',
     data: {
-      labels: theLabels,
-      datasets: [
-        {
-          label: "CO2_1",
-          tension: 0.4,
-          fill: false,
-          borderColor: colors[0],
-          data: co2_1
-        },
-        {
-          label: "CO2_2",
-          tension: 0.4,
-          fill: false,
-          borderColor: colors[1],
-          data: co2_2
-        },
-        {
-          label: "CO2_3",
-          tension: 0.4,
-          fill: false,
-          borderColor: colors[2],
-          data: co2_3
-        },
-        {
-          label: "CO2_4",
-          tension: 0.4,
-          fill: false,
-          borderColor: colors[3],
-          data: co2_4
-        },
-        {
-          label: "CO2_5",
-          tension: 0.4,
-          fill: false,
-          borderColor: colors[4],
-          data: co2_5
-        },
-        {
-          label: "CO2_6",
-          tension: 0.4,
-          fill: false,
-          borderColor: colors[5],
-          data: co2_6
-        },
-      ]
-    }
-  });
-
-  const o2_1 = samples.map(function(d) {return d.O2_1});
-  const o2_2 = samples.map(function(d) {return d.O2_2});
-  const o2_3 = samples.map(function(d) {return d.O2_3});
-  const o2_4 = samples.map(function(d) {return d.O2_4});
-  const o2_5 = samples.map(function(d) {return d.O2_5});
-  const o2_6 = samples.map(function(d) {return d.O2_6});
-
-  var chart = new Chart(ctxO2, {
-    type: 'line',
-    data: {
-      labels: theLabels,
-      datasets: [
-        {
-          label: "O2_1",
-          tension: 0.4,
-          fill: false,
-          borderColor: colors[0],
-          data: o2_1
-        },
-        {
-          label: "O2_2",
-          tension: 0.4,
-          fill: false,
-          borderColor: colors[1],
-          data: o2_2
-        },
-        {
-          label: "O2_3",
-          tension: 0.4,
-          fill: false,
-          borderColor: colors[2],
-          data: o2_3
-        },
-        {
-          label: "O2_4",
-          tension: 0.4,
-          fill: false,
-          borderColor: colors[3],
-          data: o2_4
-        },
-        {
-          label: "O2_5",
-          tension: 0.4,
-          fill: false,
-          borderColor: colors[4],
-          data: o2_5
-        },
-        {
-          label: "O2_6",
-          tension: 0.4,
-          fill: false,
-          borderColor: colors[5],
-          data: o2_6
-        },
-      ]
-    }
+      labels: [],
+      datasets: [],
+    },
+    options: options
   });
 }
 
-// Area Chart Example
-// var ctx = document.getElementById("myAreaChart");
-// var myLineChart = new Chart(ctx, {
-//   type: 'line',
-//   data: {
-//     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-//     datasets: [{
-//       label: "Earnings",
-//       lineTension: 0.3,
-//       backgroundColor: "rgba(78, 115, 223, 0.05)",
-//       borderColor: "rgba(78, 115, 223, 1)",
-//       pointRadius: 3,
-//       pointBackgroundColor: "rgba(78, 115, 223, 1)",
-//       pointBorderColor: "rgba(78, 115, 223, 1)",
-//       pointHoverRadius: 3,
-//       pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-//       pointHoverBorderColor: "rgba(78, 115, 223, 1)",
-//       pointHitRadius: 10,
-//       pointBorderWidth: 2,
-//       data: [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000],
-//     }],
-//   },
-//   options: {
-//     maintainAspectRatio: false,
-//     layout: {
-//       padding: {
-//         left: 10,
-//         right: 25,
-//         top: 25,
-//         bottom: 0
-//       }
-//     },
-//     scales: {
-//       xAxes: [{
-//         time: {
-//           unit: 'date'
-//         },
-//         gridLines: {
-//           display: false,
-//           drawBorder: false
-//         },
-//         ticks: {
-//           maxTicksLimit: 7
-//         }
-//       }],
-//       yAxes: [{
-//         ticks: {
-//           maxTicksLimit: 5,
-//           padding: 10,
-//           // Include a dollar sign in the ticks
-//           callback: function(value, index, values) {
-//             return '$' + number_format(value);
-//           }
-//         },
-//         gridLines: {
-//           color: "rgb(234, 236, 244)",
-//           zeroLineColor: "rgb(234, 236, 244)",
-//           drawBorder: false,
-//           borderDash: [2],
-//           zeroLineBorderDash: [2]
-//         }
-//       }],
-//     },
-//     legend: {
-//       display: false
-//     },
-//     tooltips: {
-//       backgroundColor: "rgb(255,255,255)",
-//       bodyFontColor: "#858796",
-//       titleMarginBottom: 10,
-//       titleFontColor: '#6e707e',
-//       titleFontSize: 14,
-//       borderColor: '#dddfeb',
-//       borderWidth: 1,
-//       xPadding: 15,
-//       yPadding: 15,
-//       displayColors: false,
-//       intersect: false,
-//       mode: 'index',
-//       caretPadding: 10,
-//       callbacks: {
-//         label: function(tooltipItem, chart) {
-//           var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-//           return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
-//         }
-//       }
-//     }
-//   }
-// });
+function makeChart(samples) {
+  console.log(samples);
+
+  // create charts if needed
+  if (co2Chart === undefined) {
+    co2Chart = ceateChart("chartCO2");
+  }
+  if (o2Chart === undefined) {
+    o2Chart = ceateChart("chartO2");
+  }
+
+  const colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796' ]
+  
+  const theLabels = samples.map(function(d) {return new Date(d.timestamp)});
+
+  const inputsCO2 = ['CO2_1', 'CO2_2', 'CO2_3', 'CO2_4', 'CO2_5', 'CO2_6']
+  const datasets = inputsCO2
+    .map((label, i) => {
+      const data = samples.map(function(d) {return d[label]});
+      return createDataset(label, colors[i], data);
+    })
+    .filter(data => data !== false);
+
+  co2Chart.data.labels = theLabels;
+  co2Chart.data.datasets = datasets;
+  co2Chart.update();
+
+  const inputsO2 = ['O2_1', 'O2_2', 'O2_3', 'O2_4', 'O2_5', 'O2_6']
+  const datasetsO2 = inputsO2
+    .map((label, i) => {
+      const data = samples.map(function(d) {return d[label]});
+      return createDataset(label, colors[i], data);
+    })
+    .filter(data => data !== false);
+
+  o2Chart.data.labels = theLabels;
+  o2Chart.data.datasets = datasetsO2;
+  o2Chart.update();
+}
+
+function digitString2(digit) {
+  return digit < 10 ? "0" + digit : digit;
+}
+
+function formatDate(date) {
+  let month = digitString2(date.getMonth() + 1)
+  let day = digitString2(date.getDate())
+  let year = date.getFullYear()
+
+  let hour = digitString2(date.getHours())
+  let minutes = digitString2(date.getMinutes())
+
+  return [year, month, day].join('-') + " " + [hour, minutes].join(":");
+}
+
+function refreshChartWithDelay(delayInHours) {
+  let now = new Date();
+
+  let untilElement = document.getElementById('datepickerUntil')
+  untilElement.value = formatDate(now)
+
+  let sinceElement = document.getElementById('datepickerSince')
+  now.setHours(now.getHours() - delayInHours)
+  sinceElement.value = formatDate(now)
+
+  refreshChart()
+}
+
+function refreshChart(download = false) {
+  let sinceElement = document.getElementById('datepickerSince')
+  let untilElement = document.getElementById('datepickerUntil')
+
+  var path = "";
+  if (sinceElement.value !== "" && untilElement.value !== "") {
+    path = `since=${sinceElement.value}&until=${untilElement.value}`
+  } else if (sinceElement.value !== "") {
+    path = `since=${sinceElement.value}`
+  } else if (untilElement.value !== "") {
+    path = `until=${untilElement.value}`
+  }
+
+  if (download) {
+    path += "format=file"
+  }
+
+  let uri = `https://bideko.elllimoner.com/index.php/sample/fetch?${path}`
+  console.log(uri)
+
+  if (download) {
+    window.open(uri, '_blank').focus()
+    return
+  }
+
+  d3.csv(uri)
+    .then(makeChart)
+}
+
+refreshChart()
