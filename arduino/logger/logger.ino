@@ -3,25 +3,24 @@
 #include <Wire.h>
 
 #include "Constants.h"
-#include "CO2Sensor.h"
-#include "O2Sensor.h"
 
 SCD30 airSensor;
-Sensor *sensors[INPUTS_SIZE];
 
+unsigned long nextBlink = 0;
 unsigned long nextRead = 0;
 unsigned long nextWrite = WRITE_PERIOD;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(57600);
   Wire.begin();
-  airSensor.begin();
 
-  // create all sensors
-  initializeAllSensors();
+//  airSensor.begin(Wire);
 
   // start Ethernet connection
   startEthernet();
+
+  // create all sensors
+  initializeAllSensors();
 }
 
 int i = 0;
@@ -39,10 +38,16 @@ void loop() {
   if (nextWrite < now) {
     String allValues = allAverages();
     Serial.println(allValues);
-    //sendHttpRequest(allValues);
+    sendHttpRequest(allValues);
 
     clearAllSensors();
     nextWrite += WRITE_PERIOD;
+  }
+
+  // blink when needed
+  if (nextBlink < now) {
+    blink();
+    nextBlink += BLINK_PERIOD;
   }
 
   // read the Internet

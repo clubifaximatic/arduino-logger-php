@@ -18,7 +18,8 @@ class SampleController extends BaseController
                 }
                 error_log($intLimit);
                 $response = $sampleModel->list($intLimit);
-                $responseData = implode("\n", $response);
+                $responseData = "id,timestamp,CO2_1,CO2_2,CO2_3,CO2_4,CO2_5,CO2_6,O2_1,O2_2,O2_3,O2_4,O2_5,O2_6,\n";
+                $responseData .= implode("\n", $response);
                 // $responseData = json_encode($response);;
             } catch (Error $e) {
                 $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
@@ -32,7 +33,11 @@ class SampleController extends BaseController
         if (!$strErrorDesc) {
             $this->sendOutput(
                 $responseData,
-                array('Content-Type: text/plain', 'HTTP/1.1 200 OK')
+                array(
+                    'Access-Control-Allow-Origin: *',
+                    'Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept',
+                    'Content-Type: text/plain', 
+                    'HTTP/1.1 200 OK')
             );
         } else {
             $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
@@ -51,6 +56,7 @@ class SampleController extends BaseController
                 $sampleModel = new SampleModel();
                 $since = date('Y-m-d H:i', strtotime('-1 hour'));
                 $until = date('Y-m-d H:i');
+                $format = "text";
                 if (isset($arrQueryStringParams['since']) && $arrQueryStringParams['since']) {
                     $since = $arrQueryStringParams['since'];
                 }
@@ -59,9 +65,9 @@ class SampleController extends BaseController
                 }
                 error_log("since " . $since . " until " . $until);
                 $response = $sampleModel->get($since, $until);
-                $responseData = implode("\n", $response);
+                $responseData = "timestamp,CO2_1,CO2_2,CO2_3,CO2_4,CO2_5,CO2_6,O2_1,O2_2,O2_3,O2_4,O2_5,O2_6,\n";
+                $responseData .= implode("\n", $response);
                 // $responseData = json_encode($response);
-
             } catch (Error $e) {
                 $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
                 $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
@@ -72,15 +78,28 @@ class SampleController extends BaseController
         }
         // send output 
         if (!$strErrorDesc) {
-            $this->sendOutput(
-                $responseData,
-                array(
-                    'Content-Description: File Transfer',
-                    'Content-Type: application/octet-stream',
-                    "Content-Disposition: attachment; filename=\"sample-" . $since . "-to-" . $until . "\"",
-                    'Content-Type: text/plain',
-                    'HTTP/1.1 200 OK')
-            );
+            if ($format == "file") {
+                $this->sendOutput(
+                    $responseData,
+                    array(
+                        'Content-Description: File Transfer',
+                        'Access-Control-Allow-Origin: *',
+                        'Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept',
+                            // 'Content-Type: application/octet-stream',
+                        "Content-Disposition: attachment; filename=\"sample-" . $since . "-to-" . $until . ".csv\"",
+                        'Content-Type: text/plain',
+                        'HTTP/1.1 200 OK')
+                );    
+            } else {
+                $this->sendOutput(
+                    $responseData,
+                    array(
+                        'Access-Control-Allow-Origin: *',
+                        'Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept',
+                        'Content-Type: text/plain',
+                        'HTTP/1.1 200 OK')
+                    );
+            }
         } else {
             $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
                 array('Content-Type: application/json', $strErrorHeader)
