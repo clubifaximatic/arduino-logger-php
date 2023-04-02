@@ -33,7 +33,7 @@ class CO2Sensor : public Sensor {
     Accumulator _accumulatorHumidity;
 
   public:
-    CO2Sensor (uint8_t n, SCD30 *airSensor);
+    CO2Sensor (uint8_t n);
     void read ();
     double averageTemperature();
     double averageHumidity();
@@ -49,8 +49,7 @@ class CO2Sensor : public Sensor {
 /**
  * 
  */
-CO2Sensor::CO2Sensor(uint8_t n, SCD30 *airSensor) {
-  //_airSensor = airSensor;
+CO2Sensor::CO2Sensor(uint8_t n) {
   _n = n;
 
   begin();
@@ -91,13 +90,13 @@ void CO2Sensor::read() {
 void CO2Sensor::select() {
   if (_n > 7) return;
 
-//  Wire.beginTransmission(TCAADDR);
-//  Wire.write(1 << _n);
-//  bool r = Wire.endTransmission();
-//  Serial.print("select ");
-//  Serial.print(_n);
-//  Serial.print(" ");
-//  Serial.println(r);
+  Wire.beginTransmission(TCAADDR);
+  Wire.write(1 << _n);
+  bool r = Wire.endTransmission();
+  Serial.print("select ");
+  Serial.print(_n);
+  Serial.print(" ");
+  Serial.println(r);
 }
 
 /**
