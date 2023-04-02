@@ -33,15 +33,15 @@ class CO2Sensor : public Sensor {
     Accumulator _accumulatorHumidity;
 
   public:
-    CO2Sensor (uint8_t n, SCD30 *airSensor);
+    CO2Sensor (uint8_t n);
     void read ();
+    double averageTemperature();
+    double averageHumidity();
+    void clear();
 
   private:
     void begin();
     void select();
-    double averageTemperature();
-    double averageHumidity();
-    void clear();
 };
 
 #endif
@@ -49,8 +49,7 @@ class CO2Sensor : public Sensor {
 /**
  * 
  */
-CO2Sensor::CO2Sensor(uint8_t n, SCD30 *airSensor) {
-  //_airSensor = airSensor;
+CO2Sensor::CO2Sensor(uint8_t n) {
   _n = n;
 
   begin();
@@ -64,17 +63,25 @@ void CO2Sensor::read() {
   select();
 
   double value = _airSensor.getCO2();
+  select();
   double valueTemperature = _airSensor.getTemperature();
+  select();
   double valueHumidity = _airSensor.getHumidity();
 
   Serial.print("CO2 ");
   Serial.print(_n);
   Serial.print(" read: ");
   Serial.println(value);
-  
-  _accumulator.increment(value);
-  _accumulatorTemperature.increment(valueTemperature);
-  _accumulatorHumidity.increment(valueHumidity);  
+
+  if (value > 0) {
+    _accumulator.increment(value);
+  }
+  if (valueTemperature > 0) {
+    _accumulatorTemperature.increment(valueTemperature);
+  }
+  if (valueHumidity > 0) {
+    _accumulatorHumidity.increment(valueHumidity);
+  }
 }
 
 /**
@@ -120,9 +127,7 @@ void CO2Sensor::begin() {
   select();
   _airSensor.begin(Wire);
   while (_airSensor.begin(Wire) == 0 && n++ < 5) {
-    Serial.print("BEGIN CO2 sensor ");
-    Serial.println(_airSensor.isConnected());
-
+    Serial.println("FAIL ");
     delay(500);
     select();
   }

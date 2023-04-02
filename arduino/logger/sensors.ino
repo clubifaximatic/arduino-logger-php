@@ -9,7 +9,7 @@ void initializeAllSensors() {
   // initialize CO2 sensors
   for (int i = 0; i < CO2_INPUTS_SIZE; i++) {
     Serial.println(CO2_INPUTS[i]);
-    sensors[pos++] = new CO2Sensor(CO2_INPUTS[i], &airSensor);
+    sensors[pos++] = new CO2Sensor(CO2_INPUTS[i]);
   }
 
   // initialize O2 sensors
@@ -33,6 +33,7 @@ String allAverages() {
     payload += sensors[i]->average();
     payload += ",";
   }
+
   return payload;
 }
 
