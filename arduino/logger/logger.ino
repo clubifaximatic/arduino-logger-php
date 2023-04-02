@@ -4,8 +4,6 @@
 
 #include "Constants.h"
 
-SCD30 airSensor;
-
 unsigned long nextBlink = 0;
 unsigned long nextRead = 0;
 unsigned long nextWrite = WRITE_PERIOD;
