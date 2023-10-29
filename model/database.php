@@ -29,6 +29,7 @@ class Database
         } catch(Exception $e) {
             throw New Exception( $e->getMessage() );
         }
+
         return false;
     }
 
