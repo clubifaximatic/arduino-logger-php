@@ -1,7 +1,7 @@
 {
-    "title": "SB Admin 2",
+    "title": "Bideko-uab",
     "name": "startbootstrap-sb-admin-2",
-    "version": "4.1.3",
+    "version": "0.0.1",
     "scripts": {
         "start": "node_modules/.bin/gulp watch"
     },
@@ -16,9 +16,9 @@
         "admin",
         "app"
     ],
-    "homepage": "https://startbootstrap.com/theme/sb-admin-2",
+    "homepage": "https://bideko.elllimoner.com",
     "bugs": {
-        "url": "https://github.com/StartBootstrap/startbootstrap-sb-admin-2/issues",
+        "url": "https://github.com/clubifaximatic/todo.git",
         "email": "feedback@startbootstrap.com"
     },
     "license": "MIT",
@@ -28,13 +28,15 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/StartBootstrap/startbootstrap-sb-admin-2.git"
+        "url": "https://github.com/clubifaximatic/todo.git"
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "5.15.3",
         "bootstrap": "4.6.0",
         "chart.js": "2.9.4",
+        "chartjs-plugin-zoom": "^2.0.1",
         "datatables.net-bs4": "1.10.24",
+        "gulp-cli": "^2.3.0",
         "jquery": "3.6.0",
         "jquery.easing": "^1.4.1"
     },

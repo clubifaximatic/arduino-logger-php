@@ -2,13 +2,14 @@
 class SampleController extends BaseController
 {
     /** 
-     * "/sample/list" Endpoint - Get list of users 
+     * "/sample/list" Endpoint - Get list of samples 
      */
     public function listAction()
     {
         $strErrorDesc = '';
         $requestMethod = $_SERVER["REQUEST_METHOD"];
         $arrQueryStringParams = $this->getQueryStringParams();
+        $sample = 0;
         if (strtoupper($requestMethod) == 'GET') {
             try {
                 $sampleModel = new SampleModel();
@@ -16,9 +17,11 @@ class SampleController extends BaseController
                 if (isset($arrQueryStringParams['limit']) && $arrQueryStringParams['limit']) {
                     $intLimit = $arrQueryStringParams['limit'];
                 }
-                error_log($intLimit);
-                $response = $sampleModel->list($intLimit);
-                $responseData = "id,timestamp,CO2_1,CO2_2,CO2_3,CO2_4,CO2_5,CO2_6,O2_1,O2_2,O2_3,O2_4,O2_5,O2_6,\n";
+                if (isset($arrQueryStringParams['sample'])) {
+                    $sample = $arrQueryStringParams['sample']
+                }
+                $response = $sampleModel->list($sample, $intLimit);
+                $responseData = "id,timestamp,CO2_1,CO2_2,CO2_3,CO2_4,CO2_5,CO2_6,O2_1,O2_2,O2_3,O2_4,O2_5,O2_6,sample\n";
                 $responseData .= implode("\n", $response);
                 // $responseData = json_encode($response);;
             } catch (Error $e) {
@@ -57,15 +60,22 @@ class SampleController extends BaseController
                 $since = date('Y-m-d H:i', strtotime('-1 hour'));
                 $until = date('Y-m-d H:i');
                 $format = "text";
+                $sample = 0;
+                $group = 0;
                 if (isset($arrQueryStringParams['since']) && $arrQueryStringParams['since']) {
                     $since = $arrQueryStringParams['since'];
                 }
                 if (isset($arrQueryStringParams['until']) && $arrQueryStringParams['until']) {
                     $until = $arrQueryStringParams['until'];
                 }
-                error_log("since " . $since . " until " . $until);
-                $response = $sampleModel->get($since, $until);
-                $responseData = "timestamp,CO2_1,CO2_2,CO2_3,CO2_4,CO2_5,CO2_6,O2_1,O2_2,O2_3,O2_4,O2_5,O2_6,\n";
+                if (isset($arrQueryStringParams['sample'])) {
+                    $sample = $arrQueryStringParams['sample']
+                }
+                if (isset($arrQueryStringParams['group'])) {
+                    $group = $arrQueryStringParams['group']
+                }
+                $response = $sampleModel->get(($sample, $since, $until, $group);
+                $responseData = "timestamp,CO2_1,CO2_2,CO2_3,CO2_4,CO2_5,CO2_6,O2_1,O2_2,O2_3,O2_4,O2_5,O2_6,sample,\n";
                 $responseData .= implode("\n", $response);
                 // $responseData = json_encode($response);
             } catch (Error $e) {
@@ -85,11 +95,11 @@ class SampleController extends BaseController
                         'Content-Description: File Transfer',
                         'Access-Control-Allow-Origin: *',
                         'Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept',
-                            // 'Content-Type: application/octet-stream',
-                        "Content-Disposition: attachment; filename=\"sample-" . $since . "-to-" . $until . ".csv\"",
+                        // 'Content-Type: application/octet-stream',
+                        "Content-Disposition: attachment; filename=\"sample-" $sample . "_" . $since . "-to-" . $until . ".csv\"",
                         'Content-Type: text/plain',
                         'HTTP/1.1 200 OK')
-                );    
+                );
             } else {
                 $this->sendOutput(
                     $responseData,
@@ -112,6 +122,7 @@ class SampleController extends BaseController
         $strErrorDesc = '';
         $requestMethod = $_SERVER["REQUEST_METHOD"];
         $arrQueryStringParams = $this->getQueryStringParams();
+        $sample = 0;
         if (strtoupper($requestMethod) == 'GET') {
             try {
                 $sampleModel = new SampleModel();
@@ -119,9 +130,14 @@ class SampleController extends BaseController
                     $strErrorDesc = 'Data parameter not found';
                     $strErrorHeader = 'HTTP/1.1 400 Bad Request';
                 } else {
+                    if (isset($arrQueryStringParams['sample'])) {
+                        $sample = $arrQueryStringParams['sample']
+                    }    
                     $data = $arrQueryStringParams['data'];
-                    error_log($data);
-                    $response = $sampleModel->set($data);
+
+                    error_log($sample . " - " . $data);
+
+                    $response = $sampleModel->set($sample, $data);
                     $responseData = json_encode($response);;
                 }
             } catch (Error $e) {

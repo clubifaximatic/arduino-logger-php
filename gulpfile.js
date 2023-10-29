@@ -58,6 +58,9 @@ function modules() {
   // ChartJS
   var chartJS = gulp.src('./node_modules/chart.js/dist/*.js')
     .pipe(gulp.dest('./vendor/chart.js'));
+  // chartjs-plugin-zoom
+  var chartjsPluginZoom = gulp.src('./node_modules/chartjs-plugin-zoom/dist/*.js')
+    .pipe(gulp.dest('./vendor/chartjs-plugin-zoom'));
   // dataTables
   var dataTables = gulp.src([
       './node_modules/datatables.net/js/*.js',
@@ -77,7 +80,7 @@ function modules() {
       '!./node_modules/jquery/dist/core.js'
     ])
     .pipe(gulp.dest('./vendor/jquery'));
-  return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, fontAwesome, jquery, jqueryEasing);
+  return merge(bootstrapJS, bootstrapSCSS, chartJS, chartjsPluginZoom , dataTables, fontAwesome, jquery, jqueryEasing);
 }
 
 // CSS task

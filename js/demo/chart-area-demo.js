@@ -28,7 +28,7 @@ const options = {
     },
     xAxes: [{
       time: {
-        unit: 'time'
+        unit: 'date'
       },
       gridLines: {
         display: true,
@@ -112,16 +112,6 @@ function createDataset(label, color, data) {
   if (allZeros(data)) {
     return false;
   }
-
-  if (label == "O2_4") {
-    label = "RH_2";
-  } else if (label == "O2_3") {
-    label = "TMP_2";
-  } else if (label == "O2_2") {
-    label = "RH_1";
-  } else if (label == "O2_1") {
-    label = "TMP_1";
-  }
   
   return {
     label: label,
@@ -150,8 +140,8 @@ function ceateChart(elementName) {
   });
 }
 
-function makeChart(samples) {
-  console.log(samples);
+function makeChart(values) {
+  console.log(values);
 
   // create charts if needed
   if (co2Chart === undefined) {
@@ -163,12 +153,12 @@ function makeChart(samples) {
 
   const colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796' ]
   
-  const theLabels = samples.map(function(d) {return new Date(d.timestamp)});
+  const theLabels = values.map(function(d) {return new Date(d.timestamp)});
 
   const inputsCO2 = ['CO2_1', 'CO2_2', 'CO2_3', 'CO2_4', 'CO2_5', 'CO2_6']
   const datasets = inputsCO2
     .map((label, i) => {
-      const data = samples.map(function(d) {return d[label]});
+      const data = values.map(function(d) {return d[label]});
       return createDataset(label, colors[i], data);
     })
     .filter(data => data !== false);
@@ -180,7 +170,7 @@ function makeChart(samples) {
   const inputsO2 = ['O2_1', 'O2_2', 'O2_3', 'O2_4', 'O2_5', 'O2_6']
   const datasetsO2 = inputsO2
     .map((label, i) => {
-      const data = samples.map(function(d) {return d[label]});
+      const data = values.map(function(d) {return d[label]});
       return createDataset(label, colors[i], data);
     })
     .filter(data => data !== false);
@@ -219,8 +209,24 @@ function refreshChartWithDelay(delayInHours) {
 }
 
 function refreshChart(download = false) {
+
+  let sample = document.getElementById('sample')
   let sinceElement = document.getElementById('datepickerSince')
   let untilElement = document.getElementById('datepickerUntil')
+
+  // decide if it is grouped by minutes (reduce datapoints)
+  var group = 0
+  if ($('#group1m').is(':checked')) {
+    group = 1
+  } else if ($('#group2m').is(':checked')) {
+    group = 2
+  } else if ($('#group5m').is(':checked')) {
+    group = 5
+  } else if ($('#group10m').is(':checked')) {
+    group = 10
+  }
+
+  console.log(group)
 
   var path = "";
   if (sinceElement.value !== "" && untilElement.value !== "") {
@@ -234,6 +240,15 @@ function refreshChart(download = false) {
   if (download) {
     path += "format=file"
   }
+
+  if (group) {
+    path += `&group=${group}`
+  }
+
+  if (sample !== null && sample.value) {
+    path += `&sample=${sample.value}`
+  }
+
 
   let uri = `https://bideko.elllimoner.com/index.php/sample/fetch?${path}`
   console.log(uri)

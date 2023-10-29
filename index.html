@@ -55,6 +55,14 @@
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
+            <input type="hidden" readonly="" name="sample" value="111">
+
+            <li class="nav-item">
+                <a class="nav-link" href="samples-2.html">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Samples 7-12</span></a>
+            </li>
+
 
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -195,8 +203,27 @@
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="groupMinutes" id="group1m" checked><label
+                                 class="form-check-label" for="group1m">1 minute | </label>
+                        <!-- </div>
+                        <div class="form-check form-check-inline"> -->
+                            <input class="form-check-input ml-1" type="radio" name="groupMinutes" id="group2m"><label 
+                                class="form-check-label" for="group2m">2 minute | </label>
+                        <!-- </div>
+                        <div class="form-check"> -->
+                            <input class="form-check-input ml-1" type="radio" name="groupMinutes" id="group5m"><label
+                                class="form-check-label" for="group5m">5 minutes | </label></input>
+                        <!-- </div>
+                        <div class="form-check"> -->
+                            <input class="form-check-input ml-1" type="radio" name="groupMinutes" id="group10m"><label
+                                class="form-check-label" for="group10m">10 minute</label>
+                        </div>
+
                         <a id="download" href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                                 class="fas fa-download fa-sm text-white-50"></i> Download</a>
+
                     </div>
 
                     
@@ -210,7 +237,7 @@
                                 <!-- Card Header - Dropdown -->
                                 <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">CO2 Sensors</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Carbon Dioxide</h6>
                                     <div class="dropdown no-arrow">
                                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -245,7 +272,7 @@
                                 <!-- Card Header - Dropdown -->
                                 <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Temperature and Relative Humidity Sensors</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Oxygen</h6>
                                     <div class="dropdown no-arrow">
                                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -406,6 +433,23 @@
 
         let download = document.getElementById('download');
         download.onclick = () => { refreshChart(true) }
+
+        $('#group1m').on("click",function(){ 
+            refreshChart();
+        });
+
+        $('#group2m').on("click",function(){ 
+            refreshChart();
+        });
+
+        $('#group5m').on("click",function(){ 
+            refreshChart();
+        });
+
+        $('#group10m').on("click",function(){ 
+            refreshChart();
+        });
+
      </script>
   
 </body>

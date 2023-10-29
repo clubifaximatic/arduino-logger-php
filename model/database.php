@@ -18,8 +18,7 @@ class Database
     public function select($query = "" , $params = [])
     {
         try {
-            $stmt = $this->executeStatement( $query , $params );
-            // $result = $stmt->get_result()->fetch_all(MYSQLI_NUM);
+            $stmt = $this->executeStatement( $query , $params, $params );
             $output = array();
             $result = $stmt->get_result();
             while ($row = $result->fetch_array(MYSQLI_NUM)) {
