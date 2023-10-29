@@ -1,4 +1,5 @@
 // Set new default font family and font color to mimic Bootstrap's default styling
+
 Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 Chart.defaults.global.defaultFontColor = '#858796';
 
@@ -153,7 +154,7 @@ function makeChart(values) {
 
   const colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796' ]
   
-  const theLabels = values.map(function(d) {return new Date(d.timestamp)});
+  const theLabels = values.map(function(d) {return d.timestamp.substring(0,16)});
 
   const inputsCO2 = ['CO2_1', 'CO2_2', 'CO2_3', 'CO2_4', 'CO2_5', 'CO2_6']
   const datasets = inputsCO2
@@ -162,6 +163,8 @@ function makeChart(values) {
       return createDataset(label, colors[i], data);
     })
     .filter(data => data !== false);
+
+  console.log(theLabels)
 
   co2Chart.data.labels = theLabels;
   co2Chart.data.datasets = datasets;
@@ -210,7 +213,6 @@ function refreshChartWithDelay(delayInHours) {
 
 function refreshChart(download = false) {
 
-  let sample = document.getElementById('sample')
   let sinceElement = document.getElementById('datepickerSince')
   let untilElement = document.getElementById('datepickerUntil')
 
@@ -218,15 +220,15 @@ function refreshChart(download = false) {
   var group = 0
   if ($('#group1m').is(':checked')) {
     group = 1
-  } else if ($('#group2m').is(':checked')) {
-    group = 2
   } else if ($('#group5m').is(':checked')) {
     group = 5
   } else if ($('#group10m').is(':checked')) {
     group = 10
+  } else if ($('#group30m').is(':checked')) {
+    group = 30
+  } else if ($('#group60m').is(':checked')) {
+    group = 60
   }
-
-  console.log(group)
 
   var path = "";
   if (sinceElement.value !== "" && untilElement.value !== "") {
@@ -245,8 +247,10 @@ function refreshChart(download = false) {
     path += `&group=${group}`
   }
 
-  if (sample !== null && sample.value) {
-    path += `&sample=${sample.value}`
+  var sample = $('#sample').val()
+  console.log(sample)
+  if (sample) {
+    path += `&sample=${sample}`
   }
 
 
